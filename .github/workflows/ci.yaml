@@ -38,7 +38,7 @@ jobs:
             --volume /var/run/docker.sock:/var/run/docker.sock \
             --name Grype anchore/grype:latest \
             localbuild/testimage:latest \
-            --output sarif --fail-on medium --add-cpes-if-none --distro alpine:3.16.3
+            --output sarif --fail-on medium --add-cpes-if-none --distro alpine:3.16.3 | tee ./results.sarif
       # - name: Scan image
       #   id: scan
       #   uses: anchore/scan-action@v3
