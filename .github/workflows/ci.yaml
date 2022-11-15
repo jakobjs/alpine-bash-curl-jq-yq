@@ -6,17 +6,17 @@ env:
   PROJECT: alpine-bash-curl-jq-yq
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Lint
-        uses: github/super-linter/slim@v4
-        env:
-          VALIDATE_ALL_CODEBASE: true
-          DEFAULT_BRANCH: main
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # lint:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+  #     - name: Lint
+  #       uses: github/super-linter/slim@v4
+  #       env:
+  #         VALIDATE_ALL_CODEBASE: true
+  #         DEFAULT_BRANCH: main
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build:
     runs-on: ubuntu-latest
@@ -38,7 +38,7 @@ jobs:
             --volume /var/run/docker.sock:/var/run/docker.sock \
             --name Grype anchore/grype:latest \
             localbuild/testimage:latest \
-            --output sarif --fail-on medium --add-cpes-if-none --distro alpine:3.16.3 | tee ./results.sarif
+            --output sarif --fail-on medium --add-cpes-if-none --distro alpine:3.11.1 | tee ./results.sarif
       # - name: Scan image
       #   id: scan
       #   uses: anchore/scan-action@v3
