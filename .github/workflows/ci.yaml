@@ -26,7 +26,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-      - name: Build local container
+      - name: Build local container for scanning
         uses: docker/build-push-action@v3
         with:
           tags: localbuild/testimage:latest
@@ -39,19 +39,38 @@ jobs:
             --name Grype anchore/grype:latest \
             localbuild/testimage:latest \
             --output sarif --fail-on medium --add-cpes-if-none --distro alpine:3.16.3 | tee ./results.sarif
+      - name: Remove test image
+        run: docker image rm localbuild/testimage --force
       - name: Upload scan report
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: ./results.sarif
       - name: Inspect scan report
         run: cat ./results.sarif
-      # - name: Login to Docker Hub
-      #   uses: docker/login-action@v2
-      #   with:
-      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
-      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
-      # - name: Build and push
-      #   uses: docker/build-push-action@v3
-      #   with:
-      #     push: true
-      #     tags: jakobjs/${{ env.PROJECT }}:latest
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.GHCR_USERNAME }}
+          password: ${{ secrets.GHCR_TOKEN }}
+          registry: ghcr.io
+      - name: Buildx
+        shell: bash
+        run: |
+          docker buildx build . -f Dockerfile -t alpine-bash-curl-jq-yq:latest
+      - name: Tag and push to DockerHub
+        run: |
+          docker tag alpine-bash-curl-jq-yq:latest jakobjs:/alpine-bash-curl-jq-yq:latest
+          docker push jakobjs/alpine-bash-curl-jq-yq:latest
+      - name: Tag and push to ghcr.io
+        run: |
+          docker tag alpine-bash-curl-jq-yq:latest ghcr.io/jakobjs/alpine-bash-curl-jq-yq:latest
+          docker push ghcr.io/jakobjs/alpine-bash-curl-jq-yq:latest
+      # - name: Syft attest
+      #   run: syft attest --output json --key ${{ secrets.COSIGN_PRIVATE_KEY }} jakobjs/${{ env.PROJECT }}:latest | tee alpine.att.json
+      # - name: Grype scan attestation
+      #   run: grype att:alpine.att.json --key cosign.pub
