@@ -37,27 +37,28 @@ jobs:
           docker run --rm \
             --volume /var/run/docker.sock:/var/run/docker.sock \
             --name Grype anchore/grype:latest \
-            localbuild/testimage:latest --add-cpes-if-none --distro alpine:3.16.3
-      - name: Scan image
-        id: scan
-        uses: anchore/scan-action@v3
-        with:
-          image: "localbuild/testimage:latest"
-          fail-build: true
-          severity-cutoff: medium
+            localbuild/testimage:latest \
+            --output sarif --fail-on medium --add-cpes-if-none --distro alpine:3.16.3
+      # - name: Scan image
+      #   id: scan
+      #   uses: anchore/scan-action@v3
+      #   with:
+      #     image: "localbuild/testimage:latest"
+      #     fail-build: true
+      #     severity-cutoff: medium
       - name: Upload scan report
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: ${{ steps.scan.outputs.sarif }}
+          sarif_file: ./results.sarif
       - name: Inspect scan report
-        run: cat ${{ steps.scan.outputs.sarif }}
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build and push
-        uses: docker/build-push-action@v3
-        with:
-          push: true
-          tags: jakobjs/${{ env.PROJECT }}:latest
+        run: cat ./results.sarif
+      # - name: Login to Docker Hub
+      #   uses: docker/login-action@v2
+      #   with:
+      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
+      # - name: Build and push
+      #   uses: docker/build-push-action@v3
+      #   with:
+      #     push: true
+      #     tags: jakobjs/${{ env.PROJECT }}:latest
