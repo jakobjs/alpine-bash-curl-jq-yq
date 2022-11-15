@@ -61,7 +61,11 @@ jobs:
       - name: Buildx
         shell: bash
         run: |
-          docker buildx build . -f Dockerfile -t alpine-bash-curl-jq-yq:local --output=type=docker --progress plain
+          docker buildx build . -f Dockerfile \
+            --squash \
+            --tag alpine-bash-curl-jq-yq:local \
+            --output=type=docker \
+            --progress plain
 
       - name: docker ls
         shell: bash
