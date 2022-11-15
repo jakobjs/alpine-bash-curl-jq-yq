@@ -61,10 +61,10 @@ jobs:
       - name: Buildx
         shell: bash
         run: |
-          docker buildx build . -f Dockerfile -t alpine-bash-curl-jq-yq:latest
+          docker buildx build . -f Dockerfile -t alpine-bash-curl-jq-yq:local --progress plain
       - name: Tag and push to DockerHub
         run: |
-          docker tag alpine-bash-curl-jq-yq:latest jakobjs/alpine-bash-curl-jq-yq:latest
+          docker tag alpine-bash-curl-jq-yq:local jakobjs/alpine-bash-curl-jq-yq:latest
           docker push jakobjs/alpine-bash-curl-jq-yq:latest
       - name: Tag and push to ghcr.io
         run: |
