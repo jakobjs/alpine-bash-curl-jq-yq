@@ -26,14 +26,18 @@ jobs:
         uses: actions/checkout@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-
       - name: Build local container
         uses: docker/build-push-action@v3
         with:
           tags: localbuild/testimage:latest
           push: false
           load: true
-
+      - name: Scan image (cmdline)
+        run: |
+          docker run --rm \
+            --volume /var/run/docker.sock:/var/run/docker.sock \
+           --name Grype anchore/grype:latest \
+           testimage:latest --add-cpes-if-none --distro alpine:3.16.3
       - name: Scan image
         id: scan
         uses: anchore/scan-action@v3
@@ -41,15 +45,12 @@ jobs:
           image: "localbuild/testimage:latest"
           fail-build: true
           severity-cutoff: medium
-
       - name: Upload scan report
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: ${{ steps.scan.outputs.sarif }}
-
       - name: Inspect scan report
         run: cat ${{ steps.scan.outputs.sarif }}
-
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
