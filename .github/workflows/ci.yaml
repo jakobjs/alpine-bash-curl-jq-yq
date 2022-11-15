@@ -66,13 +66,13 @@ jobs:
             --tag alpine-bash-curl-jq-yq:local \
             --output=type=docker \
             --progress plain
-      - name: Tag and push to DockerHub
+      - name: Push to DockerHub
         run: |
           docker tag alpine-bash-curl-jq-yq:local jakobjs/alpine-bash-curl-jq-yq:latest
           docker push jakobjs/alpine-bash-curl-jq-yq:latest
-      - name: Tag and push to ghcr.io
+      - name: Push to ghcr.io
         run: |
-          docker tag alpine-bash-curl-jq-yq:latest ghcr.io/jakobjs/alpine-bash-curl-jq-yq:latest
+          docker tag alpine-bash-curl-jq-yq:local ghcr.io/jakobjs/alpine-bash-curl-jq-yq:latest
           docker push ghcr.io/jakobjs/alpine-bash-curl-jq-yq:latest
       # - name: Syft attest
       #   run: syft attest --output json --key ${{ secrets.COSIGN_PRIVATE_KEY }} jakobjs/${{ env.PROJECT }}:latest | tee alpine.att.json
