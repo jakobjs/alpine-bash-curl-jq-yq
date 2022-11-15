@@ -36,8 +36,8 @@ jobs:
         run: |
           docker run --rm \
             --volume /var/run/docker.sock:/var/run/docker.sock \
-           --name Grype anchore/grype:latest \
-           testimage:latest --add-cpes-if-none --distro alpine:3.16.3
+            --name Grype anchore/grype:latest \
+            localbuild/testimage:latest --add-cpes-if-none --distro alpine:3.16.3
       - name: Scan image
         id: scan
         uses: anchore/scan-action@v3
