@@ -1,6 +1,6 @@
 ARG ALPINE_VERSION
 
-FROM alpine:3.17.0
+FROM alpine:3.17.1
 
 LABEL maintainer="jakobjs" \
       version="0.0.1"
